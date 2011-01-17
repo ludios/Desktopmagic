@@ -102,9 +102,9 @@ def saveScreenToBmp(bmpFilename):
 
 
 def _demo():
+	saveScreenToBmp('screencapture.bmp')
 	im = getScreenAsImage()
 	im.save('screencapture.png', format='png')
-	saveScreenToBmp('screencapture.bmp')
 
 
 if __name__ == '__main__':
