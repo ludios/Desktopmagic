@@ -76,9 +76,16 @@ def getScreenRawBytes():
 		# 	'bmBitsPixel': 32, 'bmPlanes': 1, 'bmWidth': 1280}
 		##print bmpInfo
 
-		width, height = bmpInfo['bmWidth'], bmpInfo['bmHeight']
-		bgrxStr = saveBitMap.GetBitmapBits(True)
-		return bgrxStr, (width, height)
+		width, height, bpp = bmpInfo['bmWidth'], bmpInfo['bmHeight'], bmpInfo['bmBitsPixel']
+		if bpp == 32:
+			bgrxStr = saveBitMap.GetBitmapBits(True) # asString=True
+			return bgrxStr, (width, height)
+		else:
+			# Cannot use saveBitMap.GetBitmapBits(True), because
+			# that does not convert 8-bit or 16-bit bitmaps to the 32-bit
+			# format we need.
+			# See http://mail.python.org/pipermail/python-win32/2010-February/010149.html
+			raise GrabFailed("Cannot convert %d-bit bitmap to 32-bit bitmap" % (bpp,))
 	finally:
 		win32gui.DeleteObject(saveBitMap.GetHandle())
 
