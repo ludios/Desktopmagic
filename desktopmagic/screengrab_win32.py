@@ -11,6 +11,13 @@ import win32con
 import win32api
 
 
+class GrabFailed(Exception):
+	"""
+	Could not take a screenshot.
+	"""
+
+
+
 def _getScreenBitMap(saveBmpFilename=None):
 	"""
 	Returns a PyCBitmap.  On the returned object x, you *must* call
@@ -23,9 +30,11 @@ def _getScreenBitMap(saveBmpFilename=None):
 	top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 	width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
 	height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
+	##print "L", left, "T", top, "dim:", width, "x", height
 
 	# Retrieve the device context (DC) for the entire window.
 	hwndDevice = win32gui.GetWindowDC(hwndDesktop)
+	##print "device", hwndDevice
 	assert isinstance(hwndDevice, (int, long)), hwndDevice
 
 	mfcDC  = win32ui.CreateDCFromHandle(hwndDevice)
@@ -36,7 +45,11 @@ def _getScreenBitMap(saveBmpFilename=None):
 			try:
 				saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
 				saveDC.SelectObject(saveBitMap)
-				saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
+				try:
+					saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
+				except win32ui.error, e:
+					raise GrabFailed("Error during BitBlt.  "
+						"Workstation might be locked.  Error was: " + str(e))
 				if saveBmpFilename is not None:
 					saveBitMap.SaveBitmapFile(saveDC, saveBmpFilename)
 			except:
@@ -55,8 +68,8 @@ def getScreenRawBytes():
 	Returns a (raw BGRX str, (width, height)) of the current screen
 	(incl. all monitors).
 	"""
+	saveBitMap = _getScreenBitMap()
 	try:
-		saveBitMap = _getScreenBitMap()
 		bmpInfo = saveBitMap.GetInfo()
 		# bmpInfo is something like {
 		# 	'bmType': 0, 'bmWidthBytes': 5120, 'bmHeight': 1024,
