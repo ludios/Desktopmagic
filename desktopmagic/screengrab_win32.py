@@ -52,7 +52,8 @@ def _getScreenBitMap(saveBmpFilename=None):
 
 def getScreenRawBytes():
 	"""
-	Returns a (raw BGRX str, (width, height))
+	Returns a (raw BGRX str, (width, height)) of the current screen
+	(incl. all monitors).
 	"""
 	try:
 		saveBitMap = _getScreenBitMap()
@@ -71,7 +72,7 @@ def getScreenRawBytes():
 
 def getScreenAsImage():
 	"""
-	Returns a PIL Image object of the current screen.
+	Returns a PIL Image object of the current screen (incl. all monitors).
 	"""
 	import Image
 
@@ -81,7 +82,7 @@ def getScreenAsImage():
 
 def saveScreenToBmp(bmpFilename):
 	"""
-	Save a screenshot to a .bmp file.  Does not require PIL.
+	Save a screenshot (incl. all monitors) to a .bmp file.  Does not require PIL.
 	"""
 	saveBitMap = _getScreenBitMap(saveBmpFilename=bmpFilename)
 	win32gui.DeleteObject(saveBitMap.GetHandle())
