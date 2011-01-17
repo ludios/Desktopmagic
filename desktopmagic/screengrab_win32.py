@@ -44,6 +44,11 @@ class GrabFailed(Exception):
 
 
 
+class DIBFailed(Exception):
+	pass
+
+
+
 def _deleteDCAndBitMap(dc, bitmap):
 	dc.DeleteDC()
 	win32gui.DeleteObject(bitmap.GetHandle())
@@ -95,7 +100,7 @@ def getDCAndBitMap(saveBmpFilename=None):
 	return saveDC, saveBitMap
 
 
-def getScreenDIB(dc, bitmap):
+def getBGR32(dc, bitmap):
 	"""
 	Returns a (raw BGR str, (width, height)) for C{dc}, C{bitmap}.
 	Guaranteed to be 32-bit.  Note that the origin of the returned image is
@@ -124,7 +129,7 @@ def getScreenDIB(dc, bitmap):
 		ctypes.pointer(bmi),
 		win32con.DIB_RGB_COLORS)
 	if ret == 0:
-		raise GrabFailed("Return code %r from GetDIBits" % (ret,))
+		raise DIBFailed("Return code %r from GetDIBits" % (ret,))
 
 	assert len(pbBits.raw) == bufferLen, len(pbBits.raw)
 
@@ -148,14 +153,19 @@ def getScreenAsImage():
 		size = (bmpInfo['bmWidth'], bmpInfo['bmHeight'])
 
 		if bmpInfo['bmBitsPixel'] == 32:
-			data = bitmap.GetBitmapBits(True) # asString = True
+			# Use GetBitmapBits and BGRX if the bpp == 32, because
+			# it's ~15% faster than the method below.
+			data = bitmap.GetBitmapBits(True) # asString=True
 			return Image.frombuffer(
 				'RGB', size, data, 'raw', 'BGRX', 0, 1)
 		else:
-			# If bpp != 32, we cannot use bitmap.GetBitmapBits,
-			# because it does not convert 8-bit or 16-bit bitmaps to
-			# the 32-bit format we need.
-			data, size = getScreenDIB(dc, bitmap)
+			# If bpp != 32, we cannot use GetBitmapBits, because it
+			# does not return a 24/32-bit image when the screen is at
+			# a lower color depth.
+			try:
+				data, size = getBGR32(dc, bitmap)
+			except DIBFailed, e:
+				raise GrabFailed("getBGR32 failed.  Error was " + str(e))
 			# BGR, 32-bit line padding, origo in lower left corner
 			return Image.frombuffer(
 				'RGB', size, data, 'raw', 'BGR', (size[0] * 3 + 3) & -4, -1)
