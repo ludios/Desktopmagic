@@ -1,4 +1,4 @@
-from desktopmagic.screengrab_win32 import GrabFailed, getScreenRawBytes
+from desktopmagic.screengrab_win32 import GrabFailed, getScreenAsImage
 
 def main():
 	print """\
@@ -14,10 +14,13 @@ and that there are no uncaught exceptions here.
 
 Repeat above after RDPing into the workstation and minimizing RDP;
 this is like disconnecting the monitor.
+
+Change your color depth settings.  Add and remove monitors.  RDP
+into at 256 colors.
 """
 	while True:
 		try:
-			getScreenRawBytes()
+			getScreenAsImage()
 			print ".",
 		except GrabFailed, e:
 			print e
