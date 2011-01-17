@@ -2,6 +2,9 @@
 Robust functions for grabbing and saving screenshots on Windows.
 """
 
+# TODO: support capture of individual displays (and at the same time with a "single screenshot")
+# Use GetDeviceCaps; see http://msdn.microsoft.com/en-us/library/dd144877%28v=vs.85%29.aspx
+
 import win32gui
 import win32ui
 import win32con
