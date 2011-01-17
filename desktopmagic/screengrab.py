@@ -1,4 +1,6 @@
-from __future__ import with_statement
+"""
+Robust functions for grabbing and saving screenshots on Windows.
+"""
 
 import win32gui
 import win32ui
