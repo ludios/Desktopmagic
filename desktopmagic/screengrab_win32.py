@@ -86,8 +86,8 @@ def getDCAndBitMap(saveBmpFilename=None):
 				saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
 			except win32ui.error, e:
 				raise GrabFailed("Error during BitBlt. "
-					"Maybe the workstation is locked, or the "
-					"display is unavailable. Error was: " + str(e))
+					"Possible reasons: locked workstation, no display, "
+					"or an active UAC elevation screen. Error was: " + str(e))
 			if saveBmpFilename is not None:
 				saveBitMap.SaveBitmapFile(saveDC, saveBmpFilename)
 		except:
