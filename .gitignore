@@ -1,0 +1,5 @@
+/build
+/_trial_temp
+*.pyc
+*.pyo
+*.class
