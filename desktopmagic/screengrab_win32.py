@@ -85,8 +85,9 @@ def getDCAndBitMap(saveBmpFilename=None):
 			try:
 				saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
 			except win32ui.error, e:
-				raise GrabFailed("Error during BitBlt.  "
-					"Workstation might be locked.  Error was: " + str(e))
+				raise GrabFailed("Error during BitBlt. "
+					"Maybe the workstation is locked, or the "
+					"display is unavailable. Error was: " + str(e))
 			if saveBmpFilename is not None:
 				saveBitMap.SaveBitmapFile(saveDC, saveBmpFilename)
 		except:
@@ -129,7 +130,7 @@ def getBGR32(dc, bitmap):
 		ctypes.pointer(bmi),
 		win32con.DIB_RGB_COLORS)
 	if ret == 0:
-		raise DIBFailed("Return code %r from GetDIBits" % (ret,))
+		raise DIBFailed("Return code 0 from GetDIBits")
 
 	assert len(pbBits.raw) == bufferLen, len(pbBits.raw)
 
@@ -165,7 +166,7 @@ def getScreenAsImage():
 			try:
 				data, size = getBGR32(dc, bitmap)
 			except DIBFailed, e:
-				raise GrabFailed("getBGR32 failed.  Error was " + str(e))
+				raise GrabFailed("getBGR32 failed. Error was " + str(e))
 			# BGR, 32-bit line padding, origo in lower left corner
 			return Image.frombuffer(
 				'RGB', size, data, 'raw', 'BGR', (size[0] * 3 + 3) & -4, -1)
