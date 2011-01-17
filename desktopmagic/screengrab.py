@@ -1,7 +1,5 @@
 from __future__ import with_statement
 
-import Image
-
 import win32gui
 import win32ui
 import win32con
@@ -70,6 +68,8 @@ def getScreenAsImage():
 	"""
 	Returns a PIL Image object of the current screen.
 	"""
+	import Image
+
 	bgrxStr, dimensions = getScreenRawBytes()
 	return Image.frombuffer('RGB', dimensions, bgrxStr, 'raw', 'BGRX', 0, 1)
 
