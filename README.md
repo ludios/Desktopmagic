@@ -22,7 +22,9 @@ This installs the module `desktopmagic`.
 Sample use
 ==========
 `desktopmagic.screengrab_win32.getScreenAsImage()` returns a PIL `Image` object
-(mode RGB) of the current screen (all monitors).  You can save it to disk:
+(mode RGB) of the current screen (all monitors).
+
+You can save it to disk:
 
 ```
 from desktopmagic.screengrab_win32 import getScreenAsImage
@@ -32,8 +34,9 @@ im.save('screencapture.png', format='png')
 ```
 
 `desktopmagic.screengrab_win32.saveScreenToBmp(bmpFilename)` save a screenshot
-(all monitors) to a .bmp file.  Does not require PIL.  The .bmp file will have
-the same bit-depth as the screen; it is not guaranteed to be 32-bit.
+(all monitors) to a .bmp file.  This does not require PIL.  The .bmp file will
+have the same bit-depth as the screen; it is not guaranteed to be 32-bit.
+You'll get an probably-unreadable BMP if your screen depth is 256 colors.
 
 See the source for more advanced/raw usage.
 
