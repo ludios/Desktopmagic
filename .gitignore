@@ -1,5 +1,7 @@
 /build
+/dist
 /_trial_temp
+/MANIFEST
 *.pyc
 *.pyo
 *.class
