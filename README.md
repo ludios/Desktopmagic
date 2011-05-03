@@ -41,7 +41,7 @@ im = getScreenAsImage()
 im.save('screencapture.png', format='png')
 ```
 
-`desktopmagic.screengrab_win32.saveScreenToBmp(bmpFilename)` save a screenshot
+`desktopmagic.screengrab_win32.saveScreenToBmp(bmpFilename)` saves a screenshot
 (all monitors) to a .bmp file.  This does not require PIL.  The .bmp file will
 have the same bit-depth as the screen; it is not guaranteed to be 32-bit.
 You'll get an probably-unreadable BMP if your screen depth is 256 colors.
