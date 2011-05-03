@@ -12,11 +12,19 @@ You may want this instead of PIL's ImageGrab because:
 	workstation is locked (as of 2011-01).
 
 
+Requirements
+============
+*	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
+
+*	If you want to use `getScreenAsImage` (and you probably do), you
+	need PIL: http://www.pythonware.com/products/pil/
+
+
 Installation
 ============
 `python setup.py install`
 
-This installs the module `desktopmagic`.
+This installs the module `desktopmagic` and the script `screengrab_torture_test`.
 
 
 Sample use
