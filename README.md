@@ -12,6 +12,7 @@ You may want this instead of PIL's ImageGrab because:
 	workstation is locked (as of 2011-01).
 
 
+
 Requirements
 ============
 *	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
@@ -20,11 +21,13 @@ Requirements
 	need PIL: http://www.pythonware.com/products/pil/
 
 
+
 Installation
 ============
 `python setup.py install`
 
 This installs the module `desktopmagic` and the script `screengrab_torture_test`.
+
 
 
 Sample use
@@ -49,6 +52,7 @@ You'll get an probably-unreadable BMP if your screen depth is 256 colors.
 See the source for more advanced/raw usage.
 
 
+
 Wishlist
 ========
 *	Support taking screenshots of just one monitor.
@@ -58,3 +62,12 @@ Wishlist
 *	Support Linux
 
 *	Write some tests
+
+
+
+Contributing
+============
+
+Patches and pull requests are welcome.
+
+This coding standard applies: http://ludios.org/coding-standard/
