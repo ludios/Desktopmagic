@@ -57,8 +57,8 @@ def _deleteDCAndBitMap(dc, bitmap):
 def getDCAndBitMap(saveBmpFilename=None):
 	"""
 	Returns a (DC, PyCBitmap).  On the returned PyCBitmap, you *must* call
-	win32gui.DeleteObject(aPyCBitmap.GetHandle()).  On the returned DC,
-	you *must* call aDC.DeleteDC()
+	win32gui.DeleteObject(aPyCBitmap.GetHandle()).  On the returned DC
+	("device context"), you *must* call aDC.DeleteDC()
 	"""
 	hwndDesktop = win32gui.GetDesktopWindow()
 
