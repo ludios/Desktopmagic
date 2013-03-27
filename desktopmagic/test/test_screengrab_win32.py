@@ -30,3 +30,8 @@ class GetMonitorRegionsTest(unittest.TestCase):
 		print "Open taskmgr.exe to make sure I'm not leaking memory right now."
 		for i in xrange(100000):
 			getMonitorRegions()
+
+
+# TODO: test this case that throws an exception because coords are too big
+#	im_25600 = getRectAsImage((0, 0, 25600, 25600))
+#	im_25600.save('screencapture_25600_25600.png', format='png')

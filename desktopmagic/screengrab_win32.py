@@ -15,32 +15,22 @@ import win32con
 import win32api
 
 
-def getMonitorRegions():
+def getDisplayRects():
 	"""
-	Returns a list containing tuples with the coordinates of each monitor that is
-	extending the desktop (not mirroring.)  This list is ordered by monitor number,
-	not by virtual screen coordinates.  Monitor 1 is the first item in the list.
+	Returns a list containing tuples with the coordinates of each display that is
+	making up the virtual screen.  This list is ordered by display number.
 
-	Each tuple is (left, top, right, bottom), specifically
-		(
-			The x-coordinate of the upper-left corner of the monitor
-			The y-coordinate of the upper-left corner of the monitor
-			The x-coordinate of the lower-right corner of the monitor
-			The y-coordinate of the lower-right corner of the monitor
-		)
+	Each tuple in the list is (left, top, right, bottom), specifically (
+		the x-coordinate of the upper-left corner of the display,
+		the y-coordinate of the upper-left corner of the display,
+		the x-coordinate of the lower-right corner of the display,
+		the y-coordinate of the lower-right corner of the display
+	)
 
 	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
-	by the top-left corner of Monitor 1.
-
-	TODO: perhaps return ((left, top), (right, bottom))?
+	by the top-left corner of Display 1.
 	"""
 	HANDLE_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
-
-	# Windows EnumDisplayMonitors:
-	# http://msdn.microsoft.com/en-us/library/windows/desktop/dd162610%28v=vs.85%29.aspx
-	# pywin32 EnumDisplayMonitors:
-	# http://timgolden.me.uk/pywin32-docs/win32api__EnumDisplayDevices_meth.html
-	# https://bitbucket.org/amauryfa/pywin32-pypy/src/0d23a353509b/win32/src/win32api_display.cpp#cl-453
 
 	monitors = win32api.EnumDisplayMonitors(None, None)
 	for m in monitors:
@@ -88,24 +78,49 @@ class DIBFailed(Exception):
 
 def _deleteDCAndBitMap(dc, bitmap):
 	dc.DeleteDC()
-	win32gui.DeleteObject(bitmap.GetHandle())
+	handle = bitmap.GetHandle()
+	# Trying to DeleteObject(0) will throw an exception; it can be 0 in the case
+	# of an untouched win32ui.CreateBitmap()
+	if handle != 0:
+		win32gui.DeleteObject(handle)
 
 
-def getDCAndBitMap(saveBmpFilename=None):
+def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	"""
 	Returns a (DC, PyCBitmap).  On the returned PyCBitmap, you *must* call
 	win32gui.DeleteObject(aPyCBitmap.GetHandle()).  On the returned DC
 	("device context"), you *must* call aDC.DeleteDC()
-	"""
-	hwndDesktop = win32gui.GetDesktopWindow()
 
-	# Get complete virtual screen, including all monitors.  Note that left/top may be negative.
-	# http://msdn.microsoft.com/en-us/library/windows/desktop/ms724385%28v=vs.85%29.aspx
-	left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-	top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
-	width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-	height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-	##print "L", left, "T", top, "dim:", width, "x", height
+	If C{saveBmpFilename} is provided, a .bmp will be saved to the specified
+	location.  This does not require PIL.  The .bmp file will have the same bit-depth
+	as the screen; it is not guaranteed to be 32-bit.  If you pass this argument, you
+	still must call C{DeleteObject} and C{DeleteDC()} on the returned objects.
+
+	If C{rect} is provided, instead of capturing the entire virtual screen, only the
+	region inside the rect will be captured.  C{rect} is a tuple of (
+		the x-coordinate of the upper-left corner of the virtual screen,
+		the y-coordinate of the upper-left corner of the virtual screen,
+		the x-coordinate of the lower-right corner of the virtual screen,
+		the y-coordinate of the lower-right corner of the virtual screen
+	)
+
+	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
+	by the top-left corner of Display 1.
+	"""
+	if rect is None:
+		# Get complete virtual screen, including all monitors.  Note that left/top may be negative.
+		# http://msdn.microsoft.com/en-us/library/windows/desktop/ms724385%28v=vs.85%29.aspx
+		left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
+		top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
+		width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
+		height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
+		##print "L", left, "T", top, "dim:", width, "x", height
+	else:
+		left, top, right, bottom = rect
+		width = right - left
+		height = bottom - top
+
+	hwndDesktop = win32gui.GetDesktopWindow()
 
 	# Retrieve the device context (DC) for the entire virtual screen.
 	hwndDevice = win32gui.GetWindowDC(hwndDesktop)
@@ -175,14 +190,10 @@ def getBGR32(dc, bitmap):
 	return pbBits.raw, (width, height)
 
 
-def getScreenAsImage():
-	"""
-	Returns a PIL Image object (mode RGB) of the current screen (incl.
-	all monitors).
-	"""
+def _getRectAsImage(rect):
 	import Image
 
-	dc, bitmap = getDCAndBitMap()
+	dc, bitmap = getDCAndBitMap(rect=rect)
 	try:
 		bmpInfo = bitmap.GetInfo()
 		# bmpInfo is something like {
@@ -212,20 +223,55 @@ def getScreenAsImage():
 		_deleteDCAndBitMap(dc, bitmap)
 
 
+def getScreenAsImage():
+	"""
+	Returns a PIL Image object (mode RGB) of the entire virtual screen.
+	"""
+	return _getRectAsImage(None)
+
+
+def getRectAsImage(rect):
+	"""
+	Returns a PIL Image object (mode RGB) of the region inside the rect.
+	See L{getDCAndBitMap} docstring for C{rect} documentation.
+
+	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
+	by the top-left corner of Display 1.
+	"""
+	return _getRectAsImage(rect)
+
+
 def saveScreenToBmp(bmpFilename):
 	"""
-	Save a screenshot (incl. all monitors) to a .bmp file.  Does not require PIL.
-	The .bmp file will have the same bit-depth as the screen; it is not
-	guaranteed to be 32-bit.
+	Save a screenshot of the entire virtual screen to a .bmp file.  Does not
+	require PIL.  The .bmp file will have the same bit-depth as the screen;
+	it is not guaranteed to be 32-bit.
 	"""
-	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename)
+	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=None)
+	_deleteDCAndBitMap(dc, bitmap)
+
+
+def saveRectToBmp(bmpFilename, rect):
+	"""
+	Save a screenshot of the region inside the rect to a .bmp file.  Does not
+	require PIL.  The .bmp file will have the same bit-depth as the screen;
+	it is not guaranteed to be 32-bit.
+
+	See L{getDCAndBitMap} docstring for C{rect} documentation.
+	"""
+	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
 	_deleteDCAndBitMap(dc, bitmap)
 
 
 def _demo():
 	saveScreenToBmp('screencapture.bmp')
+	saveRectToBmp('screencapture_256_256.bmp', rect=(0, 0, 256, 256))
+
 	im = getScreenAsImage()
 	im.save('screencapture.png', format='png')
+
+	im_256 = getRectAsImage((0, 0, 256, 256))
+	im_256.save('screencapture_256_256.png', format='png')
 
 
 if __name__ == '__main__':
