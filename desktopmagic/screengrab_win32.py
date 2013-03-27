@@ -37,40 +37,10 @@ def getDisplayRects():
 	return list(m[SCREEN_RECT] for m in monitors)
 
 
-class BITMAPINFOHEADER(ctypes.Structure):
-	_fields_ = [
-		('biSize', ctypes.c_uint32),
-		('biWidth', ctypes.c_int),
-		('biHeight', ctypes.c_int),
-		('biPlanes', ctypes.c_short),
-		('biBitCount', ctypes.c_short),
-		('biCompression', ctypes.c_uint32),
-		('biSizeImage', ctypes.c_uint32),
-		('biXPelsPerMeter', ctypes.c_long),
-		('biYPelsPerMeter', ctypes.c_long),
-		('biClrUsed', ctypes.c_uint32),
-		('biClrImportant', ctypes.c_uint32)
-	]
-
-
-
-class BITMAPINFO(ctypes.Structure):
-	_fields_ = [
-		('bmiHeader', BITMAPINFOHEADER),
-		('bmiColors', ctypes.c_ulong * 3)
-	]
-
-
-
 class GrabFailed(Exception):
 	"""
 	Could not take a screenshot.
 	"""
-
-
-
-class DIBFailed(Exception):
-	pass
 
 
 
@@ -85,14 +55,14 @@ def _deleteDCAndBitMap(dc, bitmap):
 
 def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	"""
-	Returns a (DC, PyCBitmap).  On the returned PyCBitmap, you *must* call
-	win32gui.DeleteObject(aPyCBitmap.GetHandle()).  On the returned DC
-	("device context"), you *must* call aDC.DeleteDC()
+	Returns a (DC, PyCBitmap).  On the returned DC ("device context"), you
+	*must* call aDC.DeleteDC().  On the returned PyCBitmap, you *must* call
+	win32gui.DeleteObject(aPyCBitmap.GetHandle()).
 
 	If C{saveBmpFilename} is provided, a .bmp will be saved to the specified
-	location.  This does not require PIL.  The .bmp file will have the same bit-depth
-	as the screen; it is not guaranteed to be 32-bit.  If you pass this argument, you
-	still must call C{DeleteObject} and C{DeleteDC()} on the returned objects.
+	filename.  This does not require PIL.  The .bmp file will have the same
+	bit-depth as the screen; it is not guaranteed to be 32-bit.  If you provide
+	this argument, you still must clean up the returned objects, as mentioned.
 
 	If C{rect} is provided, instead of capturing the entire virtual screen, only the
 	region inside the rect will be captured.  C{rect} is a tuple of (
@@ -150,6 +120,36 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 		mfcDC.DeleteDC()
 
 	return saveDC, saveBitMap
+
+
+class BITMAPINFOHEADER(ctypes.Structure):
+	_fields_ = [
+		('biSize', ctypes.c_uint32),
+		('biWidth', ctypes.c_int),
+		('biHeight', ctypes.c_int),
+		('biPlanes', ctypes.c_short),
+		('biBitCount', ctypes.c_short),
+		('biCompression', ctypes.c_uint32),
+		('biSizeImage', ctypes.c_uint32),
+		('biXPelsPerMeter', ctypes.c_long),
+		('biYPelsPerMeter', ctypes.c_long),
+		('biClrUsed', ctypes.c_uint32),
+		('biClrImportant', ctypes.c_uint32)
+	]
+
+
+
+class BITMAPINFO(ctypes.Structure):
+	_fields_ = [
+		('bmiHeader', BITMAPINFOHEADER),
+		('bmiColors', ctypes.c_ulong * 3)
+	]
+
+
+
+class DIBFailed(Exception):
+	pass
+
 
 
 def getBGR32(dc, bitmap):
