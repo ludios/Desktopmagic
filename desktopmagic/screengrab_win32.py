@@ -256,9 +256,9 @@ def getDisplaysAsImages():
 	Image based on display information.  This method ensures that all displays
 	are captured at the same time (or as close to it as Windows permits).
 	"""
-	# im has an origin at (0, 0), but the `rect` information in our rects may
-	# have negative x and y coordinates.  So we normalize all coordinates
-	# in the rects to be >= 0.
+	# im has an origin at (0, 0) in the top-left corner of the virtual screen,
+	# but our `rect`s have a (0, 0) origin in the top-left corner of Display 1.
+	# So we normalize all coordinates in the rects to be >= 0.
 	normalizedRects = normalizeRects(getDisplayRects())
 	im = getScreenAsImage()
 
