@@ -2,9 +2,6 @@
 Robust functions for grabbing and saving screenshots on Windows.
 """
 
-# TODO: support capture of individual displays (and at the same time with a "single screenshot")
-# Use GetDeviceCaps; see http://msdn.microsoft.com/en-us/library/dd144877%28v=vs.85%29.aspx
-
 # TODO: check screen metrics and EnumDisplayMonitors at least twice (in a loop) to avoid
 # race conditions during monitor changes
 
@@ -230,11 +227,37 @@ def getScreenAsImage():
 	return _getRectAsImage(None)
 
 
+def _normalizeRects(rects):
+	smallestX = min(rect[0] for rect in rects)
+	smallestY = min(rect[1] for rect in rects)
+	normalizedRects = []
+	for left, top, right, bottom in rects:
+		normalizedRects.append(
+			(-smallestX + left,
+			 -smallestY + top,
+			 -smallestX + right,
+			 -smallestY + bottom))
+	return normalizedRects
+
+
 def getDisplaysAsImages():
 	"""
 	Returns a list of PIL Image objects (mode RGB), one for each display.
+	This list is ordered by display number.
+
+	Internally, this captures the entire virtual screen and then crops out each
+	Image based on display information.  This method ensures all displays
+	are captured at the same time (or as close to it as Windows permits).
 	"""
-	1/0
+	import Image
+
+	# im has an origin at (0, 0), but the `rect` information in our rects may
+	# have negative x and y coordinates.  So we normalize all the coordinates
+	# in the rects to be >= 0.
+	normalizedRects = _normalizeRects(getDisplayRects())
+	im = getScreenAsImage()
+
+	return list(im.crop(rect) for rect in normalizedRects)
 
 
 def getRectAsImage(rect):
@@ -271,19 +294,29 @@ def saveRectToBmp(bmpFilename, rect):
 
 
 def _demo():
-	saveScreenToBmp('screencapture.bmp')
+	# Save the entire virtual screen as a BMP (no PIL required)
+	saveScreenToBmp('screencapture_entire.bmp')
+
+	# Save an arbitrary rectangle of the virtual screen as a BMP (no PIL required)
 	saveRectToBmp('screencapture_256_256.bmp', rect=(0, 0, 256, 256))
 
-	im = getScreenAsImage()
-	im.save('screencapture.png', format='png')
+	# Save the entire virtual screen as a PNG
+	entireScreen = getScreenAsImage()
+	entireScreen.save('screencapture_entire.png', format='png')
 
-	im256 = getRectAsImage((0, 0, 256, 256))
-	im256.save('screencapture_256_256.png', format='png')
+	# Capture an arbitrary rectangle of the virtual screen: (left, top, right, bottom)
+	rect256 = getRectAsImage((0, 0, 256, 256))
+	rect256.save('screencapture_256_256.png', format='png')
 
-	# Unsynchronized capture, one display at a time
+	# Unsynchronized capture, one display at a time.
+	# If you need all displays, use getDisplaysAsImages() instead.
 	for displayNumber, rect in enumerate(getDisplayRects()):
 		imDisplay = getRectAsImage(rect)
-		imDisplay.save('screencapture_display_%d.png' % (displayNumber,), format='png')
+		imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber,), format='png')
+
+	# Synchronized capture, entire virtual screen at once, but with one Image per display.
+	for displayNumber, im in enumerate(getDisplaysAsImages()):
+		im.save('screencapture_sync_display_%d.png' % (displayNumber,), format='png')
 
 
 if __name__ == '__main__':
