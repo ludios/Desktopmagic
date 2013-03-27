@@ -1,18 +1,18 @@
-from desktopmagic.screengrab_win32 import getMonitorRegions
+from desktopmagic.screengrab_win32 import getDisplayRects
 
 import unittest
 
-class GetMonitorRegionsTest(unittest.TestCase):
+class GetDisplayRectsTest(unittest.TestCase):
 	"""
-	Tests for L{getMonitorRegions}
+	Tests for L{getDisplayRects}
 	"""
-	def test_getMonitorRegionsReturnsList(self):
+	def test_getDisplayRectsReturnsList(self):
 		"""
-		L{getMonitorRegions} returns a list of length >= 1 with a tuple containing 4 integers,
+		L{getDisplayRects} returns a list of length >= 1 with a tuple containing 4 integers,
 		representing the dimensions ??? of each monitor.
 		"""
-		regions = getMonitorRegions()
-		print "Monitor regions are:", regions
+		regions = getDisplayRects()
+		print "Display rects are:", regions
 		self.assertIsInstance(regions, list)
 		for region in regions:
 			self.assertIsInstance(region, tuple)
@@ -20,16 +20,16 @@ class GetMonitorRegionsTest(unittest.TestCase):
 				self.assertIsInstance(num, int)
 
 
-	def disabled_test_getMonitorRegionsDoesNotLeak(self):
+	def disabled_test_getDisplayRectsDoesNotLeak(self):
 		"""
-		Calling L{getMonitorRegions} 100,000 times does not leak memory (you'll have to
+		Calling L{getDisplayRects} 100,000 times does not leak memory (you'll have to
 		open taskmgr to make sure.)
 
 		Disabled because Ivan manually confirmed that it does not leak.
 		"""
 		print "Open taskmgr.exe to make sure I'm not leaking memory right now."
 		for i in xrange(100000):
-			getMonitorRegions()
+			getDisplayRects()
 
 
 # TODO: test this case that throws an exception because coords are too big
