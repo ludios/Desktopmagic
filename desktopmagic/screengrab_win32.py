@@ -230,6 +230,13 @@ def getScreenAsImage():
 	return _getRectAsImage(None)
 
 
+def getDisplaysAsImages():
+	"""
+	Returns a list of PIL Image objects (mode RGB), one for each display.
+	"""
+	1/0
+
+
 def getRectAsImage(rect):
 	"""
 	Returns a PIL Image object (mode RGB) of the region inside the rect.
@@ -270,8 +277,13 @@ def _demo():
 	im = getScreenAsImage()
 	im.save('screencapture.png', format='png')
 
-	im_256 = getRectAsImage((0, 0, 256, 256))
-	im_256.save('screencapture_256_256.png', format='png')
+	im256 = getRectAsImage((0, 0, 256, 256))
+	im256.save('screencapture_256_256.png', format='png')
+
+	# Unsynchronized capture, one display at a time
+	for displayNumber, rect in enumerate(getDisplayRects()):
+		imDisplay = getRectAsImage(rect)
+		imDisplay.save('screencapture_display_%d.png' % (displayNumber,), format='png')
 
 
 if __name__ == '__main__':
