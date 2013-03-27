@@ -231,14 +231,12 @@ def getScreenAsImage():
 def _normalizeRects(rects):
 	smallestX = min(rect[0] for rect in rects)
 	smallestY = min(rect[1] for rect in rects)
-	normalizedRects = []
-	for left, top, right, bottom in rects:
-		normalizedRects.append(
-			(-smallestX + left,
-			 -smallestY + top,
-			 -smallestX + right,
-			 -smallestY + bottom))
-	return normalizedRects
+	return list(
+		(-smallestX + left,
+		 -smallestY + top,
+		 -smallestX + right,
+		 -smallestY + bottom) for left, top, right, bottom in rects
+	)
 
 
 def getDisplaysAsImages():
