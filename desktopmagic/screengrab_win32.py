@@ -248,8 +248,6 @@ def getDisplaysAsImages():
 	Image based on display information.  This method ensures that all displays
 	are captured at the same time (or as close to it as Windows permits).
 	"""
-	import Image
-
 	# im has an origin at (0, 0), but the `rect` information in our rects may
 	# have negative x and y coordinates.  So we normalize all the coordinates
 	# in the rects to be >= 0.
