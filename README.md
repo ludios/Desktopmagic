@@ -27,8 +27,8 @@ Requirements
 ============
 *	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
 
-*	If you want to use `getScreenAsImage`, `getDisplaysAsImages`, or
-	`getRectAsImage`, you need PIL: http://www.pythonware.com/products/pil/
+*	PIL: http://www.pythonware.com/products/pil/ - unless you don't need
+	`getScreenAsImage`, `getDisplaysAsImages`, or `getRectAsImage`.
 
 
 
