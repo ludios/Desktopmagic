@@ -34,13 +34,13 @@ def getMonitorRegions():
 
 	TODO: perhaps return ((left, top), (right, bottom))?
 	"""
-	H_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
+	HANDLE_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
 
 	# Windows EnumDisplayMonitors:
 	# http://msdn.microsoft.com/en-us/library/windows/desktop/dd162610%28v=vs.85%29.aspx
 	# pywin32 EnumDisplayMonitors:
 	# http://timgolden.me.uk/pywin32-docs/win32api__EnumDisplayDevices_meth.html
-	# https://bitbucket.org/amauryfa/pywin32-pypy/src/0d23a353509b/win32/src/win32api_display.cpp#cl-343
+	# https://bitbucket.org/amauryfa/pywin32-pypy/src/0d23a353509b/win32/src/win32api_display.cpp#cl-453
 
 	monitors = win32api.EnumDisplayMonitors(None, None)
 	for m in monitors:
@@ -107,7 +107,7 @@ def getDCAndBitMap(saveBmpFilename=None):
 	height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
 	##print "L", left, "T", top, "dim:", width, "x", height
 
-	# Retrieve the device context (DC) for the entire window.
+	# Retrieve the device context (DC) for the entire virtual screen.
 	hwndDevice = win32gui.GetWindowDC(hwndDesktop)
 	##print "device", hwndDevice
 	assert isinstance(hwndDevice, (int, long)), hwndDevice
