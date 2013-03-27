@@ -228,7 +228,12 @@ def getScreenAsImage():
 	return _getRectAsImage(None)
 
 
-def _normalizeRects(rects):
+def normalizeRects(rects):
+	"""
+	Normalize a list of rects (e.g. as returned by L{getDisplayRects()})
+	to make all coordinates >= 0.  This is useful if you want to do your own
+	cropping of an entire virtual screen as returned by L{getScreenAsImage()}.
+	"""
 	smallestX = min(rect[0] for rect in rects)
 	smallestY = min(rect[1] for rect in rects)
 	return list(
@@ -251,7 +256,7 @@ def getDisplaysAsImages():
 	# im has an origin at (0, 0), but the `rect` information in our rects may
 	# have negative x and y coordinates.  So we normalize all coordinates
 	# in the rects to be >= 0.
-	normalizedRects = _normalizeRects(getDisplayRects())
+	normalizedRects = normalizeRects(getDisplayRects())
 	im = getScreenAsImage()
 
 	return list(im.crop(rect) for rect in normalizedRects)
