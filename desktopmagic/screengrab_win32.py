@@ -245,7 +245,7 @@ def getDisplaysAsImages():
 	This list is ordered by display number.
 
 	Internally, this captures the entire virtual screen and then crops out each
-	Image based on display information.  This method ensures all displays
+	Image based on display information.  This method ensures that all displays
 	are captured at the same time (or as close to it as Windows permits).
 	"""
 	import Image
