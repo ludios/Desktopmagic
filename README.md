@@ -1,8 +1,9 @@
-Desktopmagic overview
-=====================
+Desktopmagic
+============
 Desktopmagic can take screenshots (Windows-only for now) without
 leaking memory in any type of error case (locked workstation, no
-monitor attached, etc).
+monitor attached, etc).  If you wish, it can be used continuously to take
+millions of screenshots.
 
 You may want this instead of PIL's ImageGrab because:
 
@@ -48,8 +49,8 @@ This installs the module `desktopmagic` and the script `screengrab_torture_test`
 
 
 
-Sample uses
-==========
+Examples
+========
 ```py
 from desktopmagic.screengrab_win32 import (
 	getDisplayRects, saveScreenToBmp, saveRectToBmp, getScreenAsImage,
