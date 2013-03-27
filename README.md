@@ -79,7 +79,7 @@ for displayNumber, rect in enumerate(getDisplayRects()):
 	imDisplay = getRectAsImage(rect)
 	imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber,), format='png')
 
-# Synchronized capture, entire virtual screen at once, but with one Image per display.
+# Synchronized capture, entire virtual screen at once, cropped to one Image per display.
 for displayNumber, im in enumerate(getDisplaysAsImages()):
 	im.save('screencapture_sync_display_%d.png' % (displayNumber,), format='png')
 ```
