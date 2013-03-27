@@ -249,7 +249,7 @@ def getDisplaysAsImages():
 	are captured at the same time (or as close to it as Windows permits).
 	"""
 	# im has an origin at (0, 0), but the `rect` information in our rects may
-	# have negative x and y coordinates.  So we normalize all the coordinates
+	# have negative x and y coordinates.  So we normalize all coordinates
 	# in the rects to be >= 0.
 	normalizedRects = _normalizeRects(getDisplayRects())
 	im = getScreenAsImage()
@@ -260,7 +260,7 @@ def getDisplaysAsImages():
 def getRectAsImage(rect):
 	"""
 	Returns a PIL Image object (mode RGB) of the region inside the rect.
-	See L{getDCAndBitMap} docstring for C{rect} documentation.
+	See the L{getDCAndBitMap} docstring for C{rect} documentation.
 
 	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
 	by the top-left corner of Display 1.
@@ -284,7 +284,7 @@ def saveRectToBmp(bmpFilename, rect):
 	require PIL.  The .bmp file will have the same bit-depth as the screen;
 	it is not guaranteed to be 32-bit.
 
-	See L{getDCAndBitMap} docstring for C{rect} documentation.
+	See the L{getDCAndBitMap} docstring for C{rect} documentation.
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
 	_deleteDCAndBitMap(dc, bitmap)
