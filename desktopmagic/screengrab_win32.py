@@ -44,13 +44,16 @@ class GrabFailed(Exception):
 
 
 
-def _deleteDCAndBitMap(dc, bitmap):
+def deleteDCAndBitMap(dc, bitmap):
 	dc.DeleteDC()
 	handle = bitmap.GetHandle()
 	# Trying to DeleteObject(0) will throw an exception; it can be 0 in the case
 	# of an untouched win32ui.CreateBitmap()
 	if handle != 0:
 		win32gui.DeleteObject(handle)
+
+# In case someone rightfully imported the private helper before we made it public
+_deleteDCAndBitMap = deleteDCAndBitMap
 
 
 def getDCAndBitMap(saveBmpFilename=None, rect=None):
@@ -112,7 +115,7 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 			if saveBmpFilename is not None:
 				saveBitMap.SaveBitmapFile(saveDC, saveBmpFilename)
 		except:
-			_deleteDCAndBitMap(saveDC, saveBitMap)
+			deleteDCAndBitMap(saveDC, saveBitMap)
 			# Let's just hope the above line doesn't raise an exception
 			# (or it will mask the previous exception)
 			raise
@@ -218,7 +221,7 @@ def _getRectAsImage(rect):
 			return Image.frombuffer(
 				'RGB', size, data, 'raw', 'BGR', (size[0] * 3 + 3) & -4, -1)
 	finally:
-		_deleteDCAndBitMap(dc, bitmap)
+		deleteDCAndBitMap(dc, bitmap)
 
 
 def getScreenAsImage():
@@ -280,7 +283,7 @@ def saveScreenToBmp(bmpFilename):
 	it is not guaranteed to be 32-bit.
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=None)
-	_deleteDCAndBitMap(dc, bitmap)
+	deleteDCAndBitMap(dc, bitmap)
 
 
 def saveRectToBmp(bmpFilename, rect):
@@ -292,7 +295,7 @@ def saveRectToBmp(bmpFilename, rect):
 	See the L{getDCAndBitMap} docstring for C{rect} documentation.
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
-	_deleteDCAndBitMap(dc, bitmap)
+	deleteDCAndBitMap(dc, bitmap)
 
 
 def _demo():
