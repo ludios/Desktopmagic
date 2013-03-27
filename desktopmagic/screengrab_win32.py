@@ -5,6 +5,9 @@ Robust functions for grabbing and saving screenshots on Windows.
 # TODO: support capture of individual displays (and at the same time with a "single screenshot")
 # Use GetDeviceCaps; see http://msdn.microsoft.com/en-us/library/dd144877%28v=vs.85%29.aspx
 
+# TODO: check screen metrics and EnumDisplayMonitors at least twice (in a loop) to avoid
+# race conditions during monitor changes
+
 import ctypes
 import win32gui
 import win32ui
@@ -14,9 +17,30 @@ import win32api
 
 def getMonitorRegions():
 	"""
-	
+	Returns a list containing tuples with the coordinates of each monitor that is
+	extending the desktop (not mirroring.)  This list is ordered by monitor number,
+	not by virtual screen coordinates.  Monitor 1 is the first item in the list.
+
+	Each tuple is (left, top, right, bottom), specifically
+		(
+			The x-coordinate of the upper-left corner of the monitor
+			The y-coordinate of the upper-left corner of the monitor
+			The x-coordinate of the lower-right corner of the monitor
+			The y-coordinate of the lower-right corner of the monitor
+		)
+
+	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
+	by the top-left corner of Monitor 1.
+
+	TODO: perhaps return ((left, top), (right, bottom))?
 	"""
 	H_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
+
+	# Windows EnumDisplayMonitors:
+	# http://msdn.microsoft.com/en-us/library/windows/desktop/dd162610%28v=vs.85%29.aspx
+	# pywin32 EnumDisplayMonitors:
+	# http://timgolden.me.uk/pywin32-docs/win32api__EnumDisplayDevices_meth.html
+	# https://bitbucket.org/amauryfa/pywin32-pypy/src/0d23a353509b/win32/src/win32api_display.cpp#cl-343
 
 	monitors = win32api.EnumDisplayMonitors(None, None)
 	for m in monitors:
@@ -75,7 +99,8 @@ def getDCAndBitMap(saveBmpFilename=None):
 	"""
 	hwndDesktop = win32gui.GetDesktopWindow()
 
-	# Get complete virtual screen, including all monitors.
+	# Get complete virtual screen, including all monitors.  Note that left/top may be negative.
+	# http://msdn.microsoft.com/en-us/library/windows/desktop/ms724385%28v=vs.85%29.aspx
 	left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
 	top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 	width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
