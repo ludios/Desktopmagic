@@ -12,6 +12,19 @@ import win32con
 import win32api
 
 
+def getMonitorRegions():
+	"""
+	
+	"""
+	H_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
+
+	monitors = win32api.EnumDisplayMonitors(None, None)
+	for m in monitors:
+		m[HDC_MONITOR].Close()
+
+	return list(m[SCREEN_RECT] for m in monitors)
+
+
 class BITMAPINFOHEADER(ctypes.Structure):
 	_fields_ = [
 		('biSize', ctypes.c_uint32),
