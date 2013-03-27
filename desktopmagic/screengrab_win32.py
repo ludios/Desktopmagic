@@ -24,8 +24,9 @@ def getDisplayRects():
 		the y-coordinate of the lower-right corner of the display
 	)
 
-	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
-	by the top-left corner of Display 1.
+	Note that the (0, 0) origin is the top-left corner of Display 1.  If you have
+	parts of any monitor to the left or above the top-left corner of Display 1,
+	you will see some negative x/y coordinates.
 	"""
 	HANDLE_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
 
