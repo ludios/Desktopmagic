@@ -66,23 +66,23 @@ saveRectToBmp('screencapture_256_256.bmp', rect=(0, 0, 256, 256))
 entireScreen = getScreenAsImage()
 entireScreen.save('screencapture_entire.png', format='png')
 
-# Capture an arbitrary rectangle of the virtual screen: (left, top, right, bottom)
-rect256 = getRectAsImage((0, 0, 256, 256))
-rect256.save('screencapture_256_256.png', format='png')
-
 # Get bounding rectangles for all displays, in display order
 print "Display rects are:", getDisplayRects()
 # -> something like [(0, 0, 1280, 1024), (-1280, 0, 0, 1024), (1280, -176, 3200, 1024)]
+
+# Capture an arbitrary rectangle of the virtual screen: (left, top, right, bottom)
+rect256 = getRectAsImage((0, 0, 256, 256))
+rect256.save('screencapture_256_256.png', format='png')
 
 # Unsynchronized capture, one display at a time.
 # If you need all displays, use getDisplaysAsImages() instead.
 for displayNumber, rect in enumerate(getDisplayRects()):
 	imDisplay = getRectAsImage(rect)
-	imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber,), format='png')
+	imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber + 1,), format='png')
 
 # Synchronized capture, entire virtual screen at once, cropped to one Image per display.
 for displayNumber, im in enumerate(getDisplaysAsImages()):
-	im.save('screencapture_sync_display_%d.png' % (displayNumber,), format='png')
+	im.save('screencapture_sync_display_%d.png' % (displayNumber + 1,), format='png')
 ```
 
 For more information, see the docstrings in https://github.com/ludios/Desktopmagic/blob/master/desktopmagic/screengrab_win32.py

@@ -353,11 +353,11 @@ def _demo():
 	# If you need all displays, use getDisplaysAsImages() instead.
 	for displayNumber, rect in enumerate(getDisplayRects()):
 		imDisplay = getRectAsImage(rect)
-		imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber,), format='png')
+		imDisplay.save('screencapture_unsync_display_%d.png' % (displayNumber + 1,), format='png')
 
 	# Synchronized capture, entire virtual screen at once, cropped to one Image per display.
 	for displayNumber, im in enumerate(getDisplaysAsImages()):
-		im.save('screencapture_sync_display_%d.png' % (displayNumber,), format='png')
+		im.save('screencapture_sync_display_%d.png' % (displayNumber + 1,), format='png')
 
 
 if __name__ == '__main__':
