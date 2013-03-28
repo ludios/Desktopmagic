@@ -19,6 +19,47 @@ class RectFailed(Exception):
 
 
 
+def getVirtualScreenRect():
+	"""
+	Returns a tuple containing (
+		the x-coordinate of the upper-left corner of the virtual screen,
+		the y-coordinate of the upper-left corner of the virtual screen,
+		the x-coordinate of the lower-right corner of the virtual screen,
+		the y-coordinate of the lower-right corner of the virtual screen
+	)
+
+	Note that both x and y coordinates may be negative; the (0, 0) origin is
+	determined by the top-left corner of the main display (not necessarily
+	Display 1).
+	"""
+	# Note that one iteration of the loop takes about 2us on a Q6600.
+	tries = 150
+	lastRect = None
+	for _ in xrange(tries):
+		# Get dimensions of the entire virtual screen.  Note that left/top may be negative.
+		# Any of these may return nonsense numbers during display configuration
+		# changes (not just "desync" between our calls, but numbers that make little
+		# sense, as if some Windows state doesn't change synchronously.)
+		# This is why we get them at least twice.
+		left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
+		top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
+		width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
+		height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
+
+		right = left + width
+		bottom = top + height
+
+		rect = (left, top, right, bottom)
+
+		if rect == lastRect:
+			return rect
+		else:
+			lastRect = rect
+
+	raise RectFailed("Could not get stable rect information after %d tries; "
+		"last was %r." % (tries, lastRect))
+
+
 def getDisplayRects():
 	"""
 	Returns a list containing tuples with the coordinates of each display that is
@@ -43,7 +84,7 @@ def getDisplayRects():
 
 	# My experiments show this needs to be no more than 3 (for 4 iterations
 	# through the loop), but use 150 in case there are pathological systems.
-	# Note that one iteration takes about 90us on a Q6600.
+	# Note that one iteration of the loop takes about 90us on a Q6600.
 	tries = 150
 	lastRects = None
 	for _ in xrange(tries):
@@ -110,17 +151,11 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	Display 1).
 	"""
 	if rect is None:
-		# Get complete virtual screen, including all monitors.  Note that left/top may be negative.
-		# http://msdn.microsoft.com/en-us/library/windows/desktop/ms724385%28v=vs.85%29.aspx
-		left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-		top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
-		width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-		height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-		##print "L", left, "T", top, "dim:", width, "x", height
-	else:
-		left, top, right, bottom = rect
-		width = right - left
-		height = bottom - top
+		rect = getVirtualScreenRect()
+
+	left, top, right, bottom = rect
+	width = right - left
+	height = bottom - top
 
 	hwndDesktop = win32gui.GetDesktopWindow()
 
