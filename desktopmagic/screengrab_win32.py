@@ -28,6 +28,9 @@ def getVirtualScreenRect():
 	Note that both x and y coordinates may be negative; the (0, 0) origin is
 	determined by the top-left corner of the main display (not necessarily
 	Display 1).
+
+	Internally, this grabs the information from Windows at least twice to avoid
+	getting bad information during changes to the display configuration.
 	"""
 	# Note that one iteration of the loop takes about 2us on a Q6600.
 	tries = 150
