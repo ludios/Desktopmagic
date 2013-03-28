@@ -2,9 +2,6 @@
 Robust functions for grabbing and saving screenshots on Windows.
 """
 
-# TODO: check screen metrics and EnumDisplayMonitors at least twice (in a loop) to avoid
-# race conditions during monitor changes
-
 import ctypes
 import win32gui
 import win32ui
