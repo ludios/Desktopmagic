@@ -12,6 +12,13 @@ import win32con
 import win32api
 
 
+class RectFailed(Exception):
+	"""
+	Could not get information about the virtual screen or a display.
+	"""
+
+
+
 def getDisplayRects():
 	"""
 	Returns a list containing tuples with the coordinates of each display that is
@@ -24,17 +31,40 @@ def getDisplayRects():
 		the y-coordinate of the lower-right corner of the display
 	)
 
-	Note that the (0, 0) origin is the top-left corner of Display 1.  If you have
-	parts of any monitor to the left or above the top-left corner of Display 1,
-	you will see some negative x/y coordinates.
+	Note that the (0, 0) origin is the top-left corner of the main display (not
+	necessarily Display 1).  If you have parts of any monitor to the left or
+	above the top-left corner of the main display, you will see some negative x/y
+	coordinates.
+
+	Internally, this grabs the information from Windows at least twice to avoid
+	getting bad information during changes to the display configuration.
 	"""
 	HANDLE_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
 
-	monitors = win32api.EnumDisplayMonitors(None, None)
-	for m in monitors:
-		m[HDC_MONITOR].Close()
+	# My experiments show this needs to be no more than 3 (for 4 iterations
+	# through the loop), but use 150 in case there are pathological systems.
+	# Note that one iteration takes about 90us on a Q6600.
+	tries = 150
+	lastRects = None
+	for _ in xrange(tries):
+		try:
+			monitors = win32api.EnumDisplayMonitors(None, None)
+		except SystemError:
+			# If you are changing your monitor configuration while EnumDisplayMonitors
+			# is enumerating the displays, it may throw SystemError.  We just try
+			# again in this case.
+			lastRects = None
+		else:
+			for m in monitors:
+				m[HDC_MONITOR].Close()
+			rects = list(m[SCREEN_RECT] for m in monitors)
+			if rects == lastRects:
+				return rects
+			else:
+				lastRects = rects
 
-	return list(m[SCREEN_RECT] for m in monitors)
+	raise RectFailed("Could not get stable rect information after %d tries; "
+		"last was %r." % (tries, lastRects))
 
 
 class GrabFailed(Exception):
@@ -75,8 +105,9 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 		the y-coordinate of the lower-right corner of the virtual screen
 	)
 
-	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
-	by the top-left corner of Display 1.
+	Note that both x and y coordinates may be negative; the (0, 0) origin is
+	determined by the top-left corner of the main display (not necessarily
+	Display 1).
 	"""
 	if rect is None:
 		# Get complete virtual screen, including all monitors.  Note that left/top may be negative.
@@ -257,8 +288,8 @@ def getDisplaysAsImages():
 	are captured at the same time (or as close to it as Windows permits).
 	"""
 	# im has an origin at (0, 0) in the top-left corner of the virtual screen,
-	# but our `rect`s have a (0, 0) origin in the top-left corner of Display 1.
-	# So we normalize all coordinates in the rects to be >= 0.
+	# but our `rect`s have a (0, 0) origin in the top-left corner of the main
+	# display.  So we normalize all coordinates in the rects to be >= 0.
 	normalizedRects = normalizeRects(getDisplayRects())
 	im = getScreenAsImage()
 
@@ -270,8 +301,9 @@ def getRectAsImage(rect):
 	Returns a PIL Image object (mode RGB) of the region inside the rect.
 	See the L{getDCAndBitMap} docstring for C{rect} documentation.
 
-	Note that both x and y coordinates may be negative; the (0, 0) origin is determined
-	by the top-left corner of Display 1.
+	Note that both x and y coordinates may be negative; the (0, 0) origin is
+	determined by the top-left corner of the main display (not necessarily
+	Display 1).
 	"""
 	return _getRectAsImage(rect)
 
