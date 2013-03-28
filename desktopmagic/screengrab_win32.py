@@ -29,8 +29,11 @@ def getVirtualScreenRect():
 	determined by the top-left corner of the main display (not necessarily
 	Display 1).
 
-	Internally, this grabs the information from Windows at least twice to avoid
-	getting bad information during changes to the display configuration.
+	Internally, this grabs the geometry from Windows at least twice to avoid
+	getting bad geometry during changes to the display configuration.
+
+	Raises L{RectFailed} if the geometry cannot be retrieved, though
+	this failure mode has never been observed.
 	"""
 	# Note that one iteration of the loop takes about 2us on a Q6600.
 	tries = 150
@@ -77,8 +80,11 @@ def getDisplayRects():
 	above the top-left corner of the main display, you will see some negative x/y
 	coordinates.
 
-	Internally, this grabs the information from Windows at least twice to avoid
-	getting bad information during changes to the display configuration.
+	Internally, this grabs the geometry from Windows at least twice to avoid
+	getting bad geometry during changes to the display configuration.
+
+	Raises L{RectFailed} if the geometry cannot be retrieved, though
+	this failure mode has never been observed.
 	"""
 	HANDLE_MONITOR, HDC_MONITOR, SCREEN_RECT = range(3)
 
@@ -149,9 +155,15 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	Note that both x and y coordinates may be negative; the (0, 0) origin is
 	determined by the top-left corner of the main display (not necessarily
 	Display 1).
+
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
 	if rect is None:
-		rect = getVirtualScreenRect()
+		try:
+			rect = getVirtualScreenRect()
+		except RectFailed, e:
+			raise GrabFailed("Error during getVirtualScreenRect: " + str(e))
 
 	left, top, right, bottom = rect
 	width = right - left
@@ -293,6 +305,9 @@ def _getRectAsImage(rect):
 def getScreenAsImage():
 	"""
 	Returns a PIL Image object (mode RGB) of the entire virtual screen.
+
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
 	return _getRectAsImage(None)
 
@@ -321,11 +336,18 @@ def getDisplaysAsImages():
 	Internally, this captures the entire virtual screen and then crops out each
 	Image based on display information.  This method ensures that all displays
 	are captured at the same time (or as close to it as Windows permits).
+
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
+	try:
+		rects = getDisplayRects()
+	except RectFailed, e:
+		raise GrabFailed("Error during getDisplayRects: " + str(e))
 	# im has an origin at (0, 0) in the top-left corner of the virtual screen,
 	# but our `rect`s have a (0, 0) origin in the top-left corner of the main
 	# display.  So we normalize all coordinates in the rects to be >= 0.
-	normalizedRects = normalizeRects(getDisplayRects())
+	normalizedRects = normalizeRects(rects)
 	im = getScreenAsImage()
 
 	return list(im.crop(rect) for rect in normalizedRects)
@@ -334,11 +356,11 @@ def getDisplaysAsImages():
 def getRectAsImage(rect):
 	"""
 	Returns a PIL Image object (mode RGB) of the region inside the rect.
+
 	See the L{getDCAndBitMap} docstring for C{rect} documentation.
 
-	Note that both x and y coordinates may be negative; the (0, 0) origin is
-	determined by the top-left corner of the main display (not necessarily
-	Display 1).
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
 	return _getRectAsImage(rect)
 
@@ -348,6 +370,9 @@ def saveScreenToBmp(bmpFilename):
 	Save a screenshot of the entire virtual screen to a .bmp file.  Does not
 	require PIL.  The .bmp file will have the same bit-depth as the screen;
 	it is not guaranteed to be 32-bit.
+
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=None)
 	deleteDCAndBitMap(dc, bitmap)
@@ -360,6 +385,9 @@ def saveRectToBmp(bmpFilename, rect):
 	it is not guaranteed to be 32-bit.
 
 	See the L{getDCAndBitMap} docstring for C{rect} documentation.
+
+	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
+	workstation, no display, or active UAC elevation screen).
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
 	deleteDCAndBitMap(dc, bitmap)
