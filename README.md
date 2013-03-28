@@ -1,9 +1,9 @@
 Desktopmagic
 ============
-Desktopmagic can take screenshots (Windows-only for now) without
-leaking memory in any type of error case (locked workstation, no
-monitor attached, etc).  If you wish, it can be used continuously to take
-millions of screenshots.
+Desktopmagic takes screenshots on Windows.  It supports any
+arrangement of multiple monitors, and does not leak memory in any
+failure mode (locked workstation, no monitor attached, etc).  If you wish,
+it can be used continuously to take millions of screenshots.
 
 You may want this instead of PIL's ImageGrab because:
 
@@ -17,7 +17,7 @@ You may want this instead of PIL's ImageGrab because:
 
 	*	Take a screenshot of an arbitrary region of the virtual screen.
 
-	(See below)
+	(See below for usage)
 
 *	PIL leaks memory if you try to take a screenshot when the
 	workstation is locked (as of 2011-01).
