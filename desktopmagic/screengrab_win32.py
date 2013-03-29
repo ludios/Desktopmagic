@@ -19,12 +19,11 @@ def checkRect(rect):
 	try:
 		left, top, right, bottom = rect
 	except ValueError:
-		raise ValueError("%r is not a valid rect; must contain 4 numbers" % (rect,))
-	try:
-		width = right - left
-		height = bottom - top
-	except TypeError:
-		raise ValueError("%r is not a valid rect; contains non-numbers" % (rect,))
+		raise ValueError("%r is not a valid rect; must contain 4 ints" % (rect,))
+	if not all(isinstance(x, (int, long)) for x in rect):
+		raise ValueError("%r is not a valid rect; must contain 4 ints" % (rect,))
+	width = right - left
+	height = bottom - top
 	if width <= 0 or height <= 0:
 		raise ValueError("%r is not a valid rect; width and height must not be "
 			"zero or negative" % (rect,))
@@ -221,7 +220,7 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 		try:
 			try:
 				saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
-			except win32ui.error, e:
+			except (win32ui.error, OverflowError), e:
 				raise GrabFailed("Could not CreateCompatibleBitmap("
 					"mfcDC, %r, %r) - perhaps too big? Error was: %s" % (width, height, e))
 			saveDC.SelectObject(saveBitMap)
