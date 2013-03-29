@@ -175,8 +175,8 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	bit-depth as the screen; it is not guaranteed to be 32-bit.  If you provide
 	this argument, you still must clean up the returned objects, as mentioned.
 
-	If C{rect} is provided, instead of capturing the entire virtual screen, only the
-	region inside the rect will be captured.  C{rect} is a tuple of (
+	If C{rect} is not C{None}, instead of capturing the entire virtual screen,
+	only the region inside the rect will be captured.  C{rect} is a tuple of (
 		the x-coordinate of the upper-left corner of the virtual screen,
 		the y-coordinate of the upper-left corner of the virtual screen,
 		the x-coordinate of the lower-right corner of the virtual screen,
@@ -405,7 +405,11 @@ def getRectAsImage(rect):
 
 	Raises L{ValueError} if C{rect}'s computed width or height is zero or
 	negative, or if rect contains nonsense.
+
+	Raises L{TypeError} if C{rect} is C{None}.
 	"""
+	if rect is None:
+		raise TypeError("Expected a tuple for rect, got None")
 	return _getRectAsImage(rect)
 
 
@@ -418,7 +422,7 @@ def saveScreenToBmp(bmpFilename):
 	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
 	workstation, no display, or active UAC elevation screen).
 	"""
-	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=None)
+	dc, bitmap = getDCAndBitMap(bmpFilename)
 	deleteDCAndBitMap(dc, bitmap)
 
 
@@ -435,8 +439,12 @@ def saveRectToBmp(bmpFilename, rect):
 
 	Raises L{ValueError} if C{rect}'s computed width or height is zero or
 	negative, or if rect contains nonsense.
+
+	Raises L{TypeError} if C{rect} is C{None}.
 	"""
-	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
+	if rect is None:
+		raise TypeError("Expected a tuple for rect, got None")
+	dc, bitmap = getDCAndBitMap(bmpFilename, rect)
 	deleteDCAndBitMap(dc, bitmap)
 
 

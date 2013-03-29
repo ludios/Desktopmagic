@@ -64,6 +64,8 @@ class RectTests(unittest.TestCase):
 		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 100, None)))
 		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, "100", None)))
 		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 200, 200, 200)))
+		self.assertRaises(TypeError, lambda: saveRectToBmp(fname, rect=None))
+		self.assertRaises(TypeError, lambda: getRectAsImage(rect=None))
 
 
 	def test_1x1SizeRect(self):
