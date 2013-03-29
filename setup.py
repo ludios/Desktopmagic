@@ -13,11 +13,12 @@ setup(
 	author_email="ivan@ludios.org",
 	classifiers=[
 		'Programming Language :: Python :: 2',
-		'Development Status :: 4 - Beta',
+		'Development Status :: 5 - Production/Stable',
 		'Environment :: Win32 (MS Windows)',
 		'Operating System :: Microsoft :: Windows',
 		'Intended Audience :: Developers',
 		'License :: OSI Approved :: MIT License',
+		'Topic :: Multimedia :: Graphics :: Capture :: Screen Capture',
 	],
 	packages=['desktopmagic', 'desktopmagic.scripts', 'desktopmagic.test'],
 	scripts=['bin/screengrab_torture_test'],
