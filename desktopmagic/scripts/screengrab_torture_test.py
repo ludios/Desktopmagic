@@ -1,4 +1,4 @@
-from desktopmagic.screengrab_win32 import GrabFailed, getScreenAsImage
+from desktopmagic.screengrab_win32 import GrabFailed, getScreenAsImage, getDisplaysAsImages, getRectAsImage
 
 def main():
 	print """\
@@ -21,7 +21,19 @@ into at 256 colors.
 	while True:
 		try:
 			getScreenAsImage()
-			print ".",
+			print "S",
+		except GrabFailed, e:
+			print e
+
+		try:
+			getDisplaysAsImages()
+			print "D",
+		except GrabFailed, e:
+			print e
+
+		try:
+			getRectAsImage((0, 0, 1, 1))
+			print "R",
 		except GrabFailed, e:
 			print e
 
