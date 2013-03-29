@@ -182,7 +182,11 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 		saveBitMap = win32ui.CreateBitmap()
 		# Above line is assumed to never raise an exception.
 		try:
-			saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
+			try:
+				saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
+			except win32ui.error, e:
+				raise GrabFailed("Could not CreateCompatibleBitmap("
+					"mfcDC, %r, %r) - perhaps too big? Error was: %s" % (width, height, e))
 			saveDC.SelectObject(saveBitMap)
 			try:
 				saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
