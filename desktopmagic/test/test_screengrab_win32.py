@@ -12,7 +12,7 @@ class GetDisplayRectsTest(unittest.TestCase):
 	def test_getDisplayRectsReturnsList(self):
 		"""
 		L{getDisplayRects} returns a list of length >= 1 with a tuple containing 4 integers,
-		representing the dimensions ??? of each monitor.
+		representing the geometry of each display.
 		"""
 		regions = getDisplayRects()
 		##print "Display rects are:", regions
@@ -58,29 +58,28 @@ class RectTests(unittest.TestCase):
 	def test_invalidRect(self):
 		fname = tempfile.mktemp()
 		self.addCleanup(self._tryUnlink, fname)
-		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(100, 100, 99, 99)))
-		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(100, 100, 99, 100)))
-		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(100, 100, 100, 99)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 100, 100)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 99, 100)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 100, 99)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 100, None)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, "100", None)))
+		self.assertRaises(ValueError, lambda: saveRectToBmp(fname, rect=(100, 100, 200, 200, 200)))
 
 
-	def test_zeroSizeRect(self):
-		"""
-		A 0x0 rect works, though you get a 1x1 BMP and PNG instead of 0x0 images.
-		(Not due to any logic on our part.)
-		"""
+	def test_1x1SizeRect(self):
 		import Image
 
 		fname = tempfile.mktemp() + '.bmp'
 		fnamePng = tempfile.mktemp() + '.png'
 		self.addCleanup(self._tryUnlink, fname)
 		self.addCleanup(self._tryUnlink, fnamePng)
-		saveRectToBmp(fname, rect=(100, 100, 100, -100))
+		saveRectToBmp(fname, rect=(100, 100, 101, 101))
 
 		with open(fname, "rb") as f:
 			im = Image.open(f)
 			self.assertEqual((1, 1), im.size)
 
-		im = getRectAsImage(rect=(100, 100, 100, -100))
+		im = getRectAsImage(rect=(100, 100, 101, 101))
 		self.assertEqual((1, 1), im.size)
 		im.save(fnamePng, format='png')
 
@@ -94,8 +93,3 @@ class RectTests(unittest.TestCase):
 		self.addCleanup(self._tryUnlink, fname)
 		# Note that 26000x26000 is big enough to fail it on my system
 		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(0, 0, 2600000, 2600000)))
-
-
-# TODO: test this case that throws an exception because coords are too big
-#	im_25600 = getRectAsImage((0, 0, 25600, 25600))
-#	im_25600.save('screencapture_25600_25600.png', format='png')

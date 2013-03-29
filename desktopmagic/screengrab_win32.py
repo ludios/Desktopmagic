@@ -9,6 +9,27 @@ import win32con
 import win32api
 
 
+def checkRect(rect):
+	"""
+	Check C{rect} for validity.
+
+	Raises L{ValueError} if C{rect}'s computed width or height is zero or
+	negative, or if rect contains nonsense.
+	"""
+	try:
+		left, top, right, bottom = rect
+	except ValueError:
+		raise ValueError("%r is not a valid rect; must contain 4 numbers" % (rect,))
+	try:
+		width = right - left
+		height = bottom - top
+	except TypeError:
+		raise ValueError("%r is not a valid rect; contains non-numbers" % (rect,))
+	if width <= 0 or height <= 0:
+		raise ValueError("%r is not a valid rect; width and height must not be "
+			"zero or negative" % (rect,))
+
+
 class RectFailed(Exception):
 	"""
 	Could not get information about the virtual screen or a display.
@@ -53,11 +74,15 @@ def getVirtualScreenRect():
 		bottom = top + height
 
 		rect = (left, top, right, bottom)
-
-		if rect == lastRect:
-			return rect
+		try:
+			checkRect(rect)
+		except ValueError:
+			lastRect = None
 		else:
-			lastRect = rect
+			if rect == lastRect:
+				return rect
+			else:
+				lastRect = rect
 
 	raise RectFailed("Could not get stable rect information after %d tries; "
 		"last was %r." % (tries, lastRect))
@@ -105,10 +130,16 @@ def getDisplayRects():
 			for m in monitors:
 				m[HDC_MONITOR].Close()
 			rects = list(m[SCREEN_RECT] for m in monitors)
-			if rects == lastRects:
-				return rects
+			try:
+				for rect in rects:
+					checkRect(rect)
+			except ValueError:
+				lastRects = None
 			else:
-				lastRects = rects
+				if rects == lastRects:
+					return rects
+				else:
+					lastRects = rects
 
 	raise RectFailed("Could not get stable rect information after %d tries; "
 		"last was %r." % (tries, lastRects))
@@ -158,12 +189,18 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 
 	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
 	workstation, no display, or active UAC elevation screen).
+
+	Raises L{ValueError} if C{rect}'s computed width or height is zero or
+	negative, or if rect contains nonsense.
 	"""
 	if rect is None:
 		try:
 			rect = getVirtualScreenRect()
 		except RectFailed, e:
 			raise GrabFailed("Error during getVirtualScreenRect: " + str(e))
+		# rect is already checked
+	else:
+		checkRect(rect)
 
 	left, top, right, bottom = rect
 	width = right - left
@@ -365,6 +402,9 @@ def getRectAsImage(rect):
 
 	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
 	workstation, no display, or active UAC elevation screen).
+
+	Raises L{ValueError} if C{rect}'s computed width or height is zero or
+	negative, or if rect contains nonsense.
 	"""
 	return _getRectAsImage(rect)
 
@@ -392,6 +432,9 @@ def saveRectToBmp(bmpFilename, rect):
 
 	Raises L{GrabFailed} if unable to take a screenshot (e.g. due to locked
 	workstation, no display, or active UAC elevation screen).
+
+	Raises L{ValueError} if C{rect}'s computed width or height is zero or
+	negative, or if rect contains nonsense.
 	"""
 	dc, bitmap = getDCAndBitMap(saveBmpFilename=bmpFilename, rect=rect)
 	deleteDCAndBitMap(dc, bitmap)
