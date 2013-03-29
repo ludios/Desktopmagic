@@ -98,6 +98,7 @@ Wishlist
 *	Python 3 support (it probably almost works and just needs testing.  But which <a href="http://stackoverflow.com/questions/3896286/image-library-for-python-3">PIL for Python 3</a>?)
 
 
+
 Contributing
 ============
 Patches and pull requests are welcome.
