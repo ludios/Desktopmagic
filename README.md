@@ -19,7 +19,7 @@ You may want this instead of PIL's ImageGrab because:
 
 	(See below for usage)
 
-*	PIL leaks memory if you try to take a screenshot when the
+*	ImageGrab leaks memory if you try to take a screenshot when the
 	workstation is locked (as of 2011-01).
 
 
@@ -28,8 +28,12 @@ Requirements
 ============
 *	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
 
-*	PIL: http://www.pythonware.com/products/pil/ - unless you don't need
+*	PIL or Pillow, unless you don't need
 	`getScreenAsImage`, `getDisplaysAsImages`, or `getRectAsImage`.
+
+	*	PIL: http://www.pythonware.com/products/pil/
+
+	*	Pillow: https://pypi.python.org/pypi/Pillow/
 
 
 

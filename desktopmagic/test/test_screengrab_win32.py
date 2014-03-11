@@ -4,6 +4,16 @@ import tempfile
 
 from desktopmagic.screengrab_win32 import getDisplayRects, saveRectToBmp, getRectAsImage, GrabFailed
 
+try:
+	# Pillow or PIL
+	from PIL import Image
+except ImportError:
+	try:
+		# some old PIL installations
+		import Image
+	except ImportError:
+		Image = None
+
 
 class GetDisplayRectsTest(unittest.TestCase):
 	"""
@@ -45,7 +55,8 @@ class RectTests(unittest.TestCase):
 
 
 	def test_workingCase(self):
-		import Image
+		if not Image:
+			self.skipTest("No PIL or Pillow")
 
 		fname = tempfile.mktemp()
 		self.addCleanup(self._tryUnlink, fname)
@@ -71,7 +82,8 @@ class RectTests(unittest.TestCase):
 
 
 	def test_1x1SizeRect(self):
-		import Image
+		if not Image:
+			self.skipTest("No PIL or Pillow")
 
 		fname = tempfile.mktemp() + '.bmp'
 		fnamePng = tempfile.mktemp() + '.png'
