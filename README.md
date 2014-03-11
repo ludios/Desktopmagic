@@ -66,6 +66,8 @@ This installs the module `desktopmagic` and the script `screengrab_torture_test`
 Examples
 ========
 ```py
+from __future__ import print_function
+
 from desktopmagic.screengrab_win32 import (
 	getDisplayRects, saveScreenToBmp, saveRectToBmp, getScreenAsImage,
 	getRectAsImage, getDisplaysAsImages)
@@ -81,7 +83,7 @@ entireScreen = getScreenAsImage()
 entireScreen.save('screencapture_entire.png', format='png')
 
 # Get bounding rectangles for all displays, in display order
-print "Display rects are:", getDisplayRects()
+print("Display rects are:", getDisplayRects())
 # -> something like [(0, 0, 1280, 1024), (-1280, 0, 0, 1024), (1280, -176, 3200, 1024)]
 
 # Capture an arbitrary rectangle of the virtual screen: (left, top, right, bottom)
