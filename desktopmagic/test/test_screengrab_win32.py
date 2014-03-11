@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import os
 import unittest
 import tempfile
@@ -25,7 +27,7 @@ class GetDisplayRectsTest(unittest.TestCase):
 		representing the geometry of each display.
 		"""
 		regions = getDisplayRects()
-		##print "Display rects are:", regions
+		##print("Display rects are:", regions)
 		self.assertIsInstance(regions, list)
 		for region in regions:
 			self.assertIsInstance(region, tuple)
@@ -40,7 +42,7 @@ class GetDisplayRectsTest(unittest.TestCase):
 
 		Disabled because Ivan manually confirmed that it does not leak.
 		"""
-		print "Open taskmgr.exe to make sure I'm not leaking memory right now."
+		print("Open taskmgr.exe to make sure I'm not leaking memory right now.")
 		for i in xrange(100000):
 			getDisplayRects()
 
@@ -109,4 +111,4 @@ class RectTests(unittest.TestCase):
 		self.addCleanup(self._tryUnlink, fname)
 		# Note that 26000x26000 is big enough to fail it on my system
 		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(0, 0, 2600000, 2600000)))
-		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(0, 0, 2600000, 260000000000000000L)))
+		self.assertRaises(GrabFailed, lambda: saveRectToBmp(fname, rect=(0, 0, 2600000, 260000000000000000)))

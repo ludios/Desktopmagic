@@ -13,6 +13,7 @@ setup(
 	author_email="ivan@ludios.org",
 	classifiers=[
 		'Programming Language :: Python :: 2',
+		'Programming Language :: Python :: 3',
 		'Development Status :: 5 - Production/Stable',
 		'Environment :: Win32 (MS Windows)',
 		'Operating System :: Microsoft :: Windows',

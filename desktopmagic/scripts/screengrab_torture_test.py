@@ -1,7 +1,11 @@
+from __future__ import print_function
+
+import sys
+
 from desktopmagic.screengrab_win32 import GrabFailed, getScreenAsImage, getDisplaysAsImages, getRectAsImage
 
 def main():
-	print """\
+	print("""\
 This program helps you test whether screengrab_win32 has memory leaks
 and other problems.  It takes a screenshot repeatedly and discards it.
 
@@ -16,26 +20,29 @@ Repeat above after RDPing into the workstation and minimizing RDP;
 this is like disconnecting the monitor.
 
 Change your color depth settings.  Add and remove monitors.  RDP
-into at 256 colors.
-"""
+in at 256 colors.
+""")
 	while True:
 		try:
 			getScreenAsImage()
-			print "S",
-		except GrabFailed, e:
-			print e
+			print("S", end=" ")
+			sys.stdout.flush()
+		except GrabFailed as e:
+			print(e)
 
 		try:
 			getDisplaysAsImages()
-			print "D",
-		except GrabFailed, e:
-			print e
+			print("D", end=" ")
+			sys.stdout.flush()
+		except GrabFailed as e:
+			print(e)
 
 		try:
 			getRectAsImage((0, 0, 1, 1))
-			print "R",
-		except GrabFailed, e:
-			print e
+			print("R", end=" ")
+			sys.stdout.flush()
+		except GrabFailed as e:
+			print(e)
 
 
 if __name__ == '__main__':

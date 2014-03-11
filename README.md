@@ -26,6 +26,8 @@ You may want this instead of PIL's ImageGrab because:
 
 Requirements
 ============
+*	Python 2.6, 2.7, or 3.3+
+
 *	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
 
 *	PIL or Pillow, unless you don't need
@@ -106,8 +108,6 @@ Wishlist
 *	OS X support
 
 *	Linux support
-
-*	Python 3 support (it probably almost works and just needs testing.  But which <a href="http://stackoverflow.com/questions/3896286/image-library-for-python-3">PIL for Python 3</a>?)
 
 
 

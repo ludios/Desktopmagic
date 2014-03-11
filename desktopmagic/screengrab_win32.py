@@ -2,11 +2,19 @@
 Robust functions for grabbing and saving screenshots on Windows.
 """
 
+from __future__ import print_function
+
 import ctypes
 import win32gui
 import win32ui
 import win32con
 import win32api
+
+try:
+	long
+except NameError:
+	# Python 3
+	long = int
 
 
 def checkRect(rect):
@@ -58,7 +66,7 @@ def getVirtualScreenRect():
 	# Note that one iteration of the loop takes about 2us on a Q6600.
 	tries = 150
 	lastRect = None
-	for _ in xrange(tries):
+	for _ in range(tries):
 		# Get dimensions of the entire virtual screen.  Note that left/top may be negative.
 		# Any of these may return nonsense numbers during display configuration
 		# changes (not just "desync" between our calls, but numbers that make little
@@ -117,7 +125,7 @@ def getDisplayRects():
 	# Note that one iteration of the loop takes about 90us on a Q6600.
 	tries = 150
 	lastRects = None
-	for _ in xrange(tries):
+	for _ in range(tries):
 		try:
 			monitors = win32api.EnumDisplayMonitors(None, None)
 		except SystemError:
@@ -195,7 +203,7 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 	if rect is None:
 		try:
 			rect = getVirtualScreenRect()
-		except RectFailed, e:
+		except RectFailed as e:
 			raise GrabFailed("Error during getVirtualScreenRect: " + str(e))
 		# rect is already checked
 	else:
@@ -209,7 +217,7 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 
 	# Retrieve the device context (DC) for the entire virtual screen.
 	hwndDevice = win32gui.GetWindowDC(hwndDesktop)
-	##print "device", hwndDevice
+	##print("device", hwndDevice)
 	assert isinstance(hwndDevice, (int, long)), hwndDevice
 
 	mfcDC  = win32ui.CreateDCFromHandle(hwndDevice)
@@ -220,13 +228,13 @@ def getDCAndBitMap(saveBmpFilename=None, rect=None):
 		try:
 			try:
 				saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
-			except (win32ui.error, OverflowError), e:
+			except (win32ui.error, OverflowError) as e:
 				raise GrabFailed("Could not CreateCompatibleBitmap("
 					"mfcDC, %r, %r) - perhaps too big? Error was: %s" % (width, height, e))
 			saveDC.SelectObject(saveBitMap)
 			try:
 				saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
-			except win32ui.error, e:
+			except win32ui.error as e:
 				raise GrabFailed("Error during BitBlt. "
 					"Possible reasons: locked workstation, no display, "
 					"or an active UAC elevation screen. Error was: " + str(e))
@@ -323,7 +331,7 @@ def _getRectAsImage(rect):
 		# bmpInfo is something like {
 		# 	'bmType': 0, 'bmWidthBytes': 5120, 'bmHeight': 1024,
 		# 	'bmBitsPixel': 32, 'bmPlanes': 1, 'bmWidth': 1280}
-		##print bmpInfo
+		##print(bmpInfo)
 		size = (bmpInfo['bmWidth'], bmpInfo['bmHeight'])
 
 		if bmpInfo['bmBitsPixel'] == 32:
@@ -338,7 +346,7 @@ def _getRectAsImage(rect):
 			# a lower color depth.
 			try:
 				data, size = getBGR32(dc, bitmap)
-			except DIBFailed, e:
+			except DIBFailed as e:
 				raise GrabFailed("getBGR32 failed. Error was " + str(e))
 			# BGR, 32-bit line padding, origo in lower left corner
 			return Image.frombuffer(
@@ -387,7 +395,7 @@ def getDisplaysAsImages():
 	"""
 	try:
 		rects = getDisplayRects()
-	except RectFailed, e:
+	except RectFailed as e:
 		raise GrabFailed("Error during getDisplayRects: " + str(e))
 	# im has an origin at (0, 0) in the top-left corner of the virtual screen,
 	# but our `rect`s have a (0, 0) origin in the top-left corner of the main
@@ -464,7 +472,7 @@ def _demo():
 	entireScreen.save('screencapture_entire.png', format='png')
 
 	# Get bounding rectangles for all displays, in display order
-	print "Display rects are:", getDisplayRects()
+	print("Display rects are:", getDisplayRects())
 	# -> something like [(0, 0, 1280, 1024), (-1280, 0, 0, 1024), (1280, -176, 3200, 1024)]
 
 	# Capture an arbitrary rectangle of the virtual screen: (left, top, right, bottom)
