@@ -1,7 +1,11 @@
 from __future__ import print_function
 
 import os
-import unittest
+try:
+	# Needed for Python 2.6 compatibility
+	import unittest2 as unittest
+except ImportError:
+	import unittest
 import tempfile
 
 from desktopmagic.screengrab_win32 import getDisplayRects, saveRectToBmp, getRectAsImage, GrabFailed
