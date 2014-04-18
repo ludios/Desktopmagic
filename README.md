@@ -42,7 +42,7 @@ Requirements
 Installation
 ============
 ```
-pip install Desktopmagic
+pip install --user Desktopmagic
 ```
 
 or:
@@ -50,13 +50,13 @@ or:
 ```
 git clone https://github.com/ludios/Desktopmagic
 cd Desktopmagic
-pip install .
+pip install --user .
 ```
 
 or without pip:
 
 ```
-python setup.py install
+python setup.py install --user
 ```
 
 This installs the module `desktopmagic` and the script `screengrab_torture_test`.
