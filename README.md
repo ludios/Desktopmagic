@@ -11,7 +11,7 @@ You may want this instead of PIL's ImageGrab because:
 
 	*	Take a screenshot of the entire virtual screen.
 
-	*	Take a screenshot of the entire virtual screen, split into separate PIL Images.
+	*	Take a screenshot of the entire virtual screen, split into one PIL Image per display.
 
 	*	Take a screenshot of just one display.
 
