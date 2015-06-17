@@ -1,5 +1,5 @@
 Desktopmagic
-============
+===
 Desktopmagic takes screenshots on Windows.  It supports any
 arrangement of multiple monitors, and does not leak memory in any
 failure mode (locked workstation, no monitor attached, etc).  If you wish,
@@ -25,7 +25,7 @@ You may want this instead of PIL's ImageGrab because:
 
 
 Requirements
-============
+---
 *	Python 2.6, 2.7, or 3.3+
 
 *	pywin32: http://sourceforge.net/projects/pywin32/files/pywin32/
@@ -40,7 +40,7 @@ Requirements
 
 
 Installation
-============
+---
 ```
 pip install --user Desktopmagic
 ```
@@ -64,7 +64,7 @@ This installs the module `desktopmagic` and the script `screengrab_torture_test`
 
 
 Examples
-========
+---
 ```py
 from __future__ import print_function
 
@@ -105,14 +105,13 @@ For more information, see the docstrings in https://github.com/ludios/Desktopmag
 
 
 Known issues
-========
-
+---
 *	Screenshots are incorrectly cropped on high-DPI displays.  Windows returns display geometry data scaled for the DPI, while the actual screenshots are unscaled.  Workaround: Right-click on python.exe, Properties, Compatibility tab, check 'Disable display scaling on high DPI settings'.  Repeat for pythonw.exe.
 
 
 
 Wishlist
-========
+---
 *	OS X support
 
 *	Linux support
@@ -120,7 +119,7 @@ Wishlist
 
 
 Contributing
-============
+---
 Patches and pull requests are welcome.
 
 This coding standard applies: http://ludios.org/coding-standard/
