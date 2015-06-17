@@ -104,6 +104,12 @@ for displayNumber, im in enumerate(getDisplaysAsImages(), 1):
 For more information, see the docstrings in https://github.com/ludios/Desktopmagic/blob/master/desktopmagic/screengrab_win32.py
 
 
+Known issues
+========
+
+*	Screenshots are incorrectly cropped on high-DPI displays.  Windows returns display geometry data scaled for the DPI, while the actual screenshots are unscaled.  Workaround: Right-click on python.exe, Properties, Compatibility tab, check 'Disable display scaling on high DPI settings'.  Repeat for pythonw.exe.
+
+
 
 Wishlist
 ========
