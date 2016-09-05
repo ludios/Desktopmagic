@@ -112,11 +112,3 @@ For more information, see the docstrings in https://github.com/ludios/Desktopmag
 	display geometry data scaled for the DPI, while the actual screenshots are
 	unscaled.  Workaround: Right-click on python.exe, Properties, Compatibility
 	tab, check 'Disable display scaling on high DPI settings'.  Repeat for pythonw.exe.
-
-
-
-## Wishlist
-
-*	OS X support
-
-*	Linux support

@@ -7,7 +7,7 @@ import desktopmagic
 setup(
 	name='Desktopmagic',
 	version=desktopmagic.__version__,
-	description="Robust multi-monitor screenshot grabber (Windows-only right now)",
+	description="Robust multi-monitor screenshot grabber for Windows",
 	url="https://github.com/ludios/Desktopmagic",
 	author="Ivan Kozik",
 	author_email="ivan@ludios.org",
